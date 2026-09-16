@@ -49,24 +49,18 @@ There are two types of data sources:
 
 ```
 User types a question
-        │
-        ▼
+
 Intent classifier checks the message
-        │
-        ├── destination question? ──► search FAISS vector store ──► get top 5 chunks
-        │
-        ├── weather question?     ──► call weather MCP server   ──► get live forecast
-        │
-        └── currency question?    ──► call currency MCP server  ──► get live rate
-                                                │
-                                                ▼
-                        Combine retrieved context + conversation history
-                                                │
-                                                ▼
-                                    Send to LLM (Gemini / OpenAI)
-                                                │
-                                                ▼
-                            Response with sources shown in the UI
+
+    - destination question?  search FAISS vector store  get top 5 chunks
+    - weather question?      call weather MCP server    get live forecast
+    - currency question?     call currency MCP server   get live rate
+
+Combine retrieved context + conversation history
+
+Send to LLM (Gemini / OpenAI)
+
+Response with sources shown in the UI
 ```
 
 A combined question (e.g. "plan a trip based on the weather") triggers both the knowledge base search and the weather MCP call before a single LLM call generates the merged response.
@@ -108,33 +102,26 @@ Content was manually reviewed and adapted from these public sources. The origina
 
 ```
 knowledge_base/*.md  (4 documents)
-         │
-         ▼
+
 MarkdownHeaderTextSplitter
   splits on # / ## / ### headers      ← preserves section context per chunk
-         │
-         ▼
+
 RecursiveCharacterTextSplitter
   chunk_size=800, overlap=150          ← further splits sections that are too long
-         │
-         ▼
+
 Embedding model
   Google: text-embedding-004
   OpenAI: text-embedding-3-small       ← 115 chunks embedded on first run
-         │
-         ▼
+
 FAISS vector store
   saved to vector_store/ on disk       ← reloaded on subsequent runs, no re-embedding
-         │
-         ▼
+
 Similarity search  k=5
   retrieves the 5 most relevant chunks for each user question
-         │
-         ▼
+
 Context assembly
   each chunk includes source name + URL as a citation header
-         │
-         ▼
+
 LLM  (Gemini / OpenAI)
   generates a grounded response from the retrieved excerpts
 ```
@@ -370,13 +357,13 @@ The assistant calls `convert_currency` (MCP) to convert 60,000 INR to SGD, then 
 
 ## Acceptance Criteria Checklist
 
-- ✅ Knowledge base built from 4 public travel resources (Wikivoyage + 3 Visit Singapore pages)
-- ✅ Embedding-based semantic retrieval (FAISS + Google/OpenAI embeddings)
-- ✅ Grounded answers with source references — title and URL shown per response
-- ✅ Weather information through an MCP tool (Open-Meteo via `weather_server.py`)
-- ✅ Currency conversion through an MCP tool (Frankfurter + ER-API via `currency_server.py`)
-- ✅ At least one response combining RAG and MCP — weather-aware itinerary and budget+itinerary scenarios
-- ✅ Multi-turn conversation with retained context — last 8 turns in LangChain message history
-- ✅ Appropriate tool selection based on user intent — keyword + regex intent classifier
-- ✅ Clear handling of missing knowledge and tool failures — explicit messages, no fabrication
-- ✅ Simple, usable interface — Streamlit chat UI with example questions and reset control
+- Knowledge base built from 4 public travel resources (Wikivoyage + 3 Visit Singapore pages)
+- Embedding-based semantic retrieval (FAISS + Google/OpenAI embeddings)
+- Grounded answers with source references — title and URL shown per response
+- Weather information through an MCP tool (Open-Meteo via `weather_server.py`)
+- Currency conversion through an MCP tool (Frankfurter + ER-API via `currency_server.py`)
+- At least one response combining RAG and MCP — weather-aware itinerary and budget+itinerary scenarios
+- Multi-turn conversation with retained context — last 8 turns in LangChain message history
+- Appropriate tool selection based on user intent — keyword + regex intent classifier
+- Clear handling of missing knowledge and tool failures — explicit messages, no fabrication
+- Simple, usable interface — Streamlit chat UI with example questions and reset control
