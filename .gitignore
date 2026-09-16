@@ -1,0 +1,27 @@
+# Environment
+.env
+*.env
+
+# Vector store (regenerated from knowledge base)
+vector_store/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Streamlit
+.streamlit/secrets.toml
